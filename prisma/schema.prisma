@@ -1,0 +1,181 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../node_modules/.prisma/client"
+  engineType    = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ===== AUTH (NextAuth.js) =====
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ===== CORE MODELS =====
+model User {
+  id            String            @id @default(cuid())
+  name          String?
+  email         String            @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  memberships   WorkspaceMember[]
+}
+
+model Workspace {
+  id              String            @id @default(cuid())
+  name            String
+  slug            String            @unique
+  description     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  members         WorkspaceMember[]
+  brand           BrandVoice?
+  funnelConfig    FunnelConfig?
+  campaigns       Campaign[]
+  contentItems    ContentItem[]
+  socialAccounts  SocialAccount[]
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  role        String    @default("VIEWER") // OWNER, MANAGER, CONTENT_CREATOR, VIEWER
+  userId      String
+  workspaceId String
+  joinedAt    DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+}
+
+// ===== BRAND IDENTITY (Module 1) =====
+model BrandVoice {
+  id               String    @id @default(cuid())
+  workspaceId      String    @unique
+  workspace        Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  brandName        String
+  industry         String
+  coreProducts     String    @default("[]") // JSON array
+  toneStyle        String    @default("professional")
+  targetAge        String?
+  targetInterests  String?   @default("[]") // JSON array
+  targetLocation   String?
+  keywords         String?   @default("[]") // JSON array
+  negativeKeywords String?   @default("[]") // JSON array
+  customPrompt     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+// ===== FUNNEL & STRATEGY (Module 2) =====
+model FunnelConfig {
+  id            String    @id @default(cuid())
+  workspaceId   String    @unique
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  awareness     Int       @default(40)
+  consideration Int       @default(30)
+  conversion    Int       @default(15)
+  loyalty       Int       @default(10)
+  advocacy      Int       @default(5)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Campaign {
+  id            String        @id @default(cuid())
+  workspaceId   String
+  workspace     Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name          String
+  description   String?
+  startDate     DateTime
+  endDate       DateTime
+  status        String        @default("PLANNED") // PLANNED, TEASING, LAUNCHING, MAINTAINING, COMPLETED
+  contentItems  ContentItem[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+// ===== CONTENT & CALENDAR (Module 3 & 4) =====
+model ContentItem {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  campaignId     String?
+  campaign       Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  title          String
+  body           String?
+  format         String    @default("IMAGE_POST") // IMAGE_POST, VIDEO, CAROUSEL, TEXT_ONLY, STORY, REEL, TIKTOK
+  funnelStage    String    // AWARENESS, CONSIDERATION, CONVERSION, LOYALTY, ADVOCACY
+  scheduledDate  DateTime
+  scheduledTime  String?
+  status         String    @default("DRAFT") // DRAFT, PENDING_REVIEW, APPROVED, SCHEDULED, PUBLISHED, FAILED
+  platform       String?
+  aiImagePrompt  String?
+  imageUrl       String?
+  metadata       String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// ===== SOCIAL ACCOUNTS (Module 6) =====
+model SocialAccount {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  platform       String
+  accountName    String
+  accessToken    String
+  refreshToken   String?
+  tokenExpiresAt DateTime?
+  pageId         String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// ===== VIETNAMESE EVENTS =====
+model CalendarEvent {
+  id          String  @id @default(cuid())
+  name        String
+  date        String  // MM-DD format for recurring, or YYYY-MM-DD
+  isLunar     Boolean @default(false)
+  category    String  // holiday, shopping, cultural
+  description String?
+  isRecurring Boolean @default(true)
+}
