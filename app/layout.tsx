@@ -14,8 +14,8 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: {
-    default: "AI Content Plan 465",
-    template: "%s | AI Content Plan 465",
+    default: "Content Automation",
+    template: "%s | Content Automation",
   },
   description: "Nền tảng SaaS lập kế hoạch nội dung AI - Xây dựng chiến lược content marketing thông minh với AI",
 };

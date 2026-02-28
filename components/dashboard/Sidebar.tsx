@@ -9,13 +9,15 @@ import {
     Settings,
     Layers,
     Target,
-    Sparkles,
+    Zap,
     ChevronLeft,
     ChevronRight,
-    LogOut,
-    Building2
+    Building2,
+    TrendingUp,
+    Brain,
+    Palette
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -25,9 +27,9 @@ const navItems = [
         icon: Layers,
     },
     {
-        label: 'Workspace',
-        href: '/dashboard/workspace',
-        icon: Building2,
+        label: 'Brand Profile',
+        href: '/dashboard/brand',
+        icon: Palette,
     },
     {
         label: 'Chiến lược',
@@ -43,6 +45,11 @@ const navItems = [
         label: 'Content Studio',
         href: '/dashboard/content',
         icon: FileText,
+    },
+    {
+        label: 'Báo Cáo',
+        href: '/dashboard/report',
+        icon: TrendingUp,
     },
     {
         label: 'AI Audit',
@@ -72,16 +79,16 @@ export default function Sidebar() {
         >
             {/* Logo */}
             <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10">
-                <div className="w-9 h-9 rounded-lg gradient-brand flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-5 h-5 text-white" />
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-500 via-blue-500 to-cyan-400 flex items-center justify-center flex-shrink-0 shadow-lg shadow-violet-500/30">
+                    <Zap className="w-5 h-5 text-white" />
                 </div>
                 {!collapsed && (
                     <div className="animate-fade-in">
-                        <h1 className="font-heading text-base font-bold text-white tracking-tight">
-                            AI Plan 465
+                        <h1 className="font-heading text-sm font-bold text-white tracking-tight leading-tight">
+                            Content<br />Automation
                         </h1>
-                        <p className="text-[10px] text-sidebar-fg/50 uppercase tracking-widest">
-                            Content Strategy
+                        <p className="text-[9px] text-sidebar-fg/50 uppercase tracking-widest">
+                            AI-Powered
                         </p>
                     </div>
                 )}
@@ -112,6 +119,36 @@ export default function Sidebar() {
                         </Link>
                     )
                 })}
+
+                {/* AI Strategist - Special gradient button */}
+                {!collapsed ? (
+                    <Link
+                        href="/dashboard/strategist"
+                        className={cn(
+                            'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 mt-2',
+                            pathname === '/dashboard/strategist'
+                                ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/30'
+                                : 'bg-gradient-to-r from-violet-600/20 to-purple-600/20 text-violet-300 hover:from-violet-600 hover:to-purple-600 hover:text-white border border-violet-500/30'
+                        )}
+                    >
+                        <Brain className="w-5 h-5 flex-shrink-0" />
+                        <span className="animate-fade-in whitespace-nowrap">Strategy</span>
+                        <span className="ml-auto text-[8px] px-1 py-0.5 rounded bg-white/20 font-bold">AI</span>
+                    </Link>
+                ) : (
+                    <Link
+                        href="/dashboard/strategist"
+                        className={cn(
+                            'flex items-center justify-center p-2.5 rounded-lg transition-all duration-200 mt-2',
+                            pathname === '/dashboard/strategist'
+                                ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg'
+                                : 'bg-violet-600/20 text-violet-300 hover:bg-violet-600 hover:text-white'
+                        )}
+                        title="AI Content Strategist"
+                    >
+                        <Brain className="w-5 h-5 flex-shrink-0" />
+                    </Link>
+                )}
             </nav>
 
             {/* Bottom */}
