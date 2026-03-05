@@ -1,18 +1,19 @@
-import { PrismaClient } from '@prisma/client'
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
-import path from 'path'
+import { PrismaClient } from '@/app/generated/prisma'
+import { PrismaLibSql } from '@prisma/adapter-libsql'
 
 const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClient | undefined
 }
 
 function createPrismaClient() {
-    // Extract the file path from DATABASE_URL (format: file:./path/to/db)
-    const dbUrl = process.env.DATABASE_URL || 'file:./prisma/dev.db'
-    const dbPath = dbUrl.replace('file:', '')
-    const absoluteDbPath = path.resolve(process.cwd(), dbPath)
+    const url = process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL || 'file:local.db'
+    const authToken = process.env.TURSO_AUTH_TOKEN
 
-    const adapter = new PrismaBetterSqlite3({ url: `file:${absoluteDbPath}` })
+    const adapter = new PrismaLibSql({
+        url,
+        authToken,
+    })
+
     return new PrismaClient({ adapter })
 }
 

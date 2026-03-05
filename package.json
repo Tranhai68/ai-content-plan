@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate",
+    "db:seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.20",
@@ -16,14 +18,14 @@
     "@fullcalendar/react": "^6.1.20",
     "@fullcalendar/timegrid": "^6.1.20",
     "@google/generative-ai": "^0.24.1",
-    "@prisma/adapter-better-sqlite3": "^7.4.1",
+    "@libsql/client": "^0.14.0",
+    "@prisma/adapter-libsql": "^7.4.2",
     "@prisma/client": "^7.4.1",
     "@tiptap/extension-placeholder": "^3.20.0",
     "@tiptap/pm": "^3.20.0",
     "@tiptap/react": "^3.20.0",
     "@tiptap/starter-kit": "^3.20.0",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^12.6.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
